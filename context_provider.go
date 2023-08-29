@@ -1,28 +1,44 @@
 package ctxprovider
 
-import "context"
+import (
+	"context"
+	"errors"
+)
 
-type ContextProvider struct {
+type CtxField string
+
+type ContextProvider interface {
+	GetCtx() context.Context
+	SetCtx(ctx context.Context) error
+	ForkCtx() context.Context
+}
+
+type ContextProviderImpl struct {
 	context context.Context
 }
 
-func NewContextProvider(parent context.Context) *ContextProvider {
-	return &ContextProvider{
+func NewContextProvider(parent context.Context) *ContextProviderImpl {
+	return &ContextProviderImpl{
 		context: parent,
 	}
 }
 
-func (c *ContextProvider) GetCtx() context.Context {
+func (c *ContextProviderImpl) GetCtx() context.Context {
 	return c.context
 }
 
-func (c *ContextProvider) SetCtx(ctx context.Context) error {
+func (c *ContextProviderImpl) SetCtx(ctx context.Context) error {
+	if ctx == nil {
+		return errors.New("invalid: ctx can't be nil")
+	}
 	c.context = ctx
 	return nil
 }
 
-func (c *ContextProvider) ForkCtx() context.Context {
+func (c *ContextProviderImpl) ForkCtx() context.Context {
+	var forked CtxField = "forked"
+
 	return context.WithValue(c.context,
-		"forked", true,
+		forked, true,
 	)
 }
