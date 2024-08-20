@@ -42,3 +42,7 @@ func (c *ContextProviderImpl) ForkCtx() context.Context {
 		forked, true,
 	)
 }
+
+func (c *ContextProviderImpl) SetField(key CtxField, value interface{}) {
+	c.context = context.WithValue(c.context, key, value)
+}
